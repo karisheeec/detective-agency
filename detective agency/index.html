@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Детективный архив — Дела № 214, 317</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Code+Pro:wght@300;400;600&display=swap" rel="stylesheet" />
+    <style>
+        /* ——— Reset & base ——— */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #1a1410;
+            --surface: #2a1f1a;
+            --card: #3d2c24;
+            --text: #e8dccc;
+            --text-muted: #b8a99a;
+            --accent: #b8863a;
+            --accent-glow: #d4a54a;
+            --border: #5a4036;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.8);
+            --radius: 12px;
+            --font-serif: 'Playfair Display', serif;
+            --font-mono: 'Source Code Pro', monospace;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-serif);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: radial-gradient(circle at 20% 30%, #2f221b 0%, #110d0a 100%);
+            background-attachment: fixed;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--surface);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-glow);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px 24px;
+            flex: 1;
+            width: 100%;
+        }
+
+        /* ——— Header ——— */
+        .header {
+            padding: 24px 0 16px;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 32px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: var(--accent);
+            text-shadow: 0 0 10px rgba(184, 134, 58, 0.3);
+        }
+
+        .logo span {
+            font-size: 2rem;
+        }
+
+        .case-number {
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            background: var(--surface);
+            padding: 6px 16px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            letter-spacing: 1px;
+        }
+
+        /* ——— Navigation: главная (список дел) ——— */
+        .cases-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .case-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 28px 22px;
+            border: 1px solid var(--border);
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .case-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-glow));
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .case-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent);
+        }
+
+        .case-card:hover::before {
+            opacity: 1;
+        }
+
+        .case-card .case-icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+        }
+
+        .case-card .case-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-glow);
+        }
+
+        .case-card .case-sub {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+
+        .case-card .case-badge {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 4px 16px;
+            border-radius: 40px;
+            background: rgba(184, 134, 58, 0.15);
+            color: var(--accent-glow);
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* ——— Sub-navigation для дела ——— */
+        .sub-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 28px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sub-nav button {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-serif);
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 40px;
+            transition: 0.25s ease;
+            white-space: nowrap;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            flex-shrink: 0;
+        }
+
+        .sub-nav button:hover {
+            color: var(--text);
+            background: rgba(184, 134, 58, 0.12);
+        }
+
+        .sub-nav button.active {
+            color: var(--accent-glow);
+            background: rgba(184, 134, 58, 0.18);
+            box-shadow: inset 0 -2px 0 var(--accent);
+        }
+
+        /* ——— Pages ——— */
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* ——— Subpages ——— */
+        .subpage {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .subpage.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ——— Card styles ——— */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 28px;
+            transition: 0.2s;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-glow);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .card-title .emoji {
+            font-size: 1.8rem;
+        }
+
+        .text-block {
+            line-height: 1.7;
+            color: var(--text);
+            font-size: 1.05rem;
+        }
+
+        .text-block p {
+            margin-bottom: 12px;
+        }
+
+        .text-block strong {
+            color: var(--accent-glow);
+            font-weight: 700;
+        }
+
+        .divider {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--border), transparent);
+            margin: 24px 0;
+        }
+
+        /* ——— Grid for suspects ——— */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .person-card {
+            background: var(--card);
+            padding: 20px 22px;
+            border-radius: var(--radius);
+            border-left: 4px solid var(--accent);
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .person-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        }
+
+        .person-card .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 12px;
+            background: var(--surface);
+            border: 3px solid var(--accent);
+            flex-shrink: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--accent-glow);
+            cursor: pointer;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .person-card .avatar:hover {
+            transform: scale(1.08);
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 20px rgba(184, 134, 58, 0.4);
+        }
+
+        .person-card .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .person-card .avatar .zoom-hint {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            border: 1px solid var(--accent);
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .person-card .avatar:hover .zoom-hint {
+            opacity: 1;
+        }
+
+        .person-card .name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-glow);
+        }
+
+        .person-card .detail {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin: 6px 0 10px;
+        }
+
+        .person-card .motif {
+            font-size: 0.9rem;
+            color: var(--text);
+            background: rgba(0, 0, 0, 0.25);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 2px solid #b8863a55;
+            width: 100%;
+        }
+
+        /* ——— Evidence & Testimony items ——— */
+        .evidence-item,
+        .testimony {
+            background: var(--card);
+            padding: 16px 20px;
+            border-radius: var(--radius);
+            border-bottom: 1px solid var(--border);
+            transition: 0.2s;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .evidence-item:hover,
+        .testimony:hover {
+            background: #4a352c;
+            transform: scale(1.01);
+        }
+
+        .evidence-item .evid-icon,
+        .testimony .testimony-icon {
+            font-size: 2.2rem;
+            flex-shrink: 0;
+            width: 48px;
+            text-align: center;
+        }
+
+        .evidence-item .evid-content,
+        .testimony .testimony-content {
+            flex: 1;
+        }
+
+        .evidence-item .evid-title {
+            font-weight: 700;
+            color: var(--accent-glow);
+            font-size: 1.05rem;
+        }
+
+        .evidence-item .evid-desc,
+        .testimony .testimony-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 4px;
+        }
+
+        .testimony .speaker {
+            font-weight: 700;
+            color: var(--accent-glow);
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* ——— Questions ——— */
+        .question-item {
+            background: var(--card);
+            padding: 18px 22px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .question-item .q {
+            font-weight: 700;
+            color: var(--accent-glow);
+            font-size: 1.1rem;
+        }
+
+        .question-item .a {
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        /* ——— Spoiler ——— */
+        .spoiler-container {
+            text-align: center;
+            margin: 30px 0 20px;
+        }
+
+        .spoiler-btn {
+            background: var(--accent);
+            border: none;
+            color: #1a1410;
+            font-family: var(--font-serif);
+            font-weight: 700;
+            font-size: 1.1rem;
+            padding: 12px 36px;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 0 20px rgba(184, 134, 58, 0.3);
+            letter-spacing: 0.5px;
+        }
+
+        .spoiler-btn:hover {
+            background: var(--accent-glow);
+            transform: scale(1.03);
+            box-shadow: 0 0 30px rgba(184, 134, 58, 0.5);
+        }
+
+        .spoiler-content {
+            display: none;
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease;
+            background: var(--surface);
+            padding: 28px;
+            border-radius: var(--radius);
+            border: 1px solid var(--accent);
+            box-shadow: var(--shadow);
+            text-align: left;
+        }
+
+        .spoiler-content.show {
+            display: block;
+        }
+
+        .spoiler-content h3 {
+            color: var(--accent-glow);
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .spoiler-content .solution {
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .spoiler-content .solution strong {
+            color: #f0d080;
+        }
+
+        /* ——— Modal ——— */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: var(--surface);
+            border-radius: var(--radius);
+            max-width: 650px;
+            width: 100%;
+            padding: 32px 28px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-box .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: 0.2s;
+            line-height: 1;
+        }
+
+        .modal-box .close-btn:hover {
+            color: var(--accent-glow);
+            transform: scale(1.2);
+        }
+
+        .modal-box .modal-image {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+        }
+
+        .modal-box .modal-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .modal-box .modal-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--accent-glow);
+            margin-bottom: 12px;
+        }
+
+        .modal-box .modal-fulltext {
+            color: var(--text);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+
+        .modal-box .modal-fulltext p {
+            margin-bottom: 10px;
+        }
+
+        /* ——— Full-image modal (для фото подозреваемых) ——— */
+        .full-image-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            cursor: pointer;
+        }
+
+        .full-image-overlay.open {
+            display: flex;
+        }
+
+        .full-image-overlay .full-image-box {
+            max-width: 80vh;
+            max-height: 85vh;
+            border-radius: var(--radius);
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 60px rgba(184, 134, 58, 0.3);
+            object-fit: contain;
+            cursor: default;
+        }
+
+        .full-image-overlay .close-full {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            color: #fff;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: 0.3s;
+            z-index: 2001;
+            background: none;
+            border: none;
+            opacity: 0.6;
+        }
+
+        .full-image-overlay .close-full:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .full-image-overlay .full-image-name {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--accent-glow);
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 28px;
+            border-radius: 40px;
+            border: 1px solid var(--accent);
+            text-align: center;
+        }
+
+        /* ——— Footer ——— */
+        .footer {
+            margin-top: 40px;
+            padding: 20px 0 10px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+        }
+
+        /* ——— Back button ——— */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-family: var(--font-serif);
+            font-size: 0.95rem;
+            transition: 0.3s;
+            margin-bottom: 16px;
+        }
+
+        .back-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+            background: rgba(184, 134, 58, 0.08);
+        }
+
+        /* ——— Responsive ——— */
+        @media (max-width: 768px) {
+            .container {
+                padding: 12px 16px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .logo {
+                font-size: 1.3rem;
+            }
+            .case-number {
+                font-size: 0.8rem;
+                padding: 4px 12px;
+            }
+            .sub-nav {
+                gap: 4px 6px;
+                padding: 4px 0 8px;
+                margin-bottom: 20px;
+            }
+            .sub-nav button {
+                font-size: 0.8rem;
+                padding: 6px 12px;
+            }
+            .card {
+                padding: 18px 16px;
+                margin-bottom: 20px;
+            }
+            .card-title {
+                font-size: 1.2rem;
+            }
+            .card-title .emoji {
+                font-size: 1.4rem;
+            }
+            .text-block {
+                font-size: 0.95rem;
+            }
+            .grid-2 {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .cases-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .case-card {
+                padding: 20px 16px;
+            }
+            .case-card .case-icon {
+                font-size: 2.2rem;
+            }
+            .case-card .case-title {
+                font-size: 1.1rem;
+            }
+            .modal-box {
+                padding: 20px 16px;
+                margin: 10px;
+            }
+            .evidence-item,
+            .testimony {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 12px 14px;
+            }
+            .evidence-item .evid-icon,
+            .testimony .testimony-icon {
+                font-size: 1.6rem;
+                width: 32px;
+            }
+            .evidence-item .evid-title {
+                font-size: 0.95rem;
+            }
+            .evidence-item .evid-desc,
+            .testimony .testimony-text {
+                font-size: 0.85rem;
+            }
+            .person-card .avatar {
+                width: 65px;
+                height: 65px;
+                font-size: 1.8rem;
+            }
+            .person-card {
+                padding: 16px;
+            }
+            .person-card .name {
+                font-size: 1rem;
+            }
+            .person-card .detail {
+                font-size: 0.8rem;
+            }
+            .person-card .motif {
+                font-size: 0.8rem;
+                padding: 6px 10px;
+            }
+            .full-image-overlay .full-image-box {
+                max-width: 95vw;
+                max-height: 70vh;
+            }
+            .full-image-overlay .close-full {
+                top: 16px;
+                right: 20px;
+                font-size: 2rem;
+            }
+            .full-image-overlay .full-image-name {
+                font-size: 1rem;
+                padding: 6px 18px;
+                bottom: 20px;
+            }
+            .question-item {
+                padding: 14px 16px;
+            }
+            .question-item .q {
+                font-size: 0.95rem;
+            }
+            .question-item .a {
+                font-size: 0.9rem;
+            }
+            .spoiler-btn {
+                padding: 10px 24px;
+                font-size: 1rem;
+                width: 100%;
+                max-width: 300px;
+            }
+            .spoiler-content {
+                padding: 18px 16px;
+            }
+            .back-btn {
+                font-size: 0.85rem;
+                padding: 6px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 8px 10px;
+            }
+            .header {
+                padding: 16px 0 10px;
+                margin-bottom: 20px;
+            }
+            .logo {
+                font-size: 1.1rem;
+            }
+            .logo span {
+                font-size: 1.4rem;
+            }
+            .sub-nav button {
+                font-size: 0.7rem;
+                padding: 4px 10px;
+            }
+            .card {
+                padding: 14px 12px;
+                border-radius: 8px;
+            }
+            .card-title {
+                font-size: 1rem;
+                margin-bottom: 10px;
+            }
+            .card-title .emoji {
+                font-size: 1.2rem;
+            }
+            .text-block {
+                font-size: 0.85rem;
+                line-height: 1.5;
+            }
+            .text-block p {
+                margin-bottom: 8px;
+            }
+            .evidence-item,
+            .testimony {
+                padding: 10px 12px;
+                gap: 6px;
+                border-radius: 8px;
+            }
+            .evidence-item .evid-icon,
+            .testimony .testimony-icon {
+                font-size: 1.4rem;
+                width: 28px;
+            }
+            .evidence-item .evid-title {
+                font-size: 0.85rem;
+            }
+            .evidence-item .evid-desc,
+            .testimony .testimony-text {
+                font-size: 0.78rem;
+            }
+            .person-card .avatar {
+                width: 56px;
+                height: 56px;
+                font-size: 1.4rem;
+                border-width: 2px;
+            }
+            .person-card {
+                padding: 12px 14px;
+                border-left-width: 3px;
+            }
+            .person-card .name {
+                font-size: 0.9rem;
+            }
+            .person-card .detail {
+                font-size: 0.75rem;
+                margin: 4px 0 6px;
+            }
+            .person-card .motif {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+            .case-card {
+                padding: 16px 12px;
+                border-radius: 8px;
+            }
+            .case-card .case-icon {
+                font-size: 1.8rem;
+            }
+            .case-card .case-title {
+                font-size: 0.95rem;
+            }
+            .case-card .case-sub {
+                font-size: 0.75rem;
+            }
+            .case-card .case-badge {
+                font-size: 0.65rem;
+                padding: 2px 12px;
+                margin-top: 8px;
+            }
+            .modal-box {
+                padding: 16px 14px;
+                border-radius: 8px;
+            }
+            .modal-box .modal-title {
+                font-size: 1rem;
+            }
+            .modal-box .modal-fulltext {
+                font-size: 0.85rem;
+            }
+            .modal-box .modal-image {
+                max-height: 140px;
+            }
+            .modal-box .close-btn {
+                font-size: 1.6rem;
+                top: 10px;
+                right: 14px;
+            }
+            .full-image-overlay .full-image-box {
+                max-height: 60vh;
+                border-width: 1px;
+            }
+            .full-image-overlay .close-full {
+                top: 12px;
+                right: 16px;
+                font-size: 1.6rem;
+            }
+            .full-image-overlay .full-image-name {
+                font-size: 0.85rem;
+                padding: 4px 14px;
+                bottom: 16px;
+            }
+            .question-item {
+                padding: 12px 14px;
+            }
+            .question-item .q {
+                font-size: 0.85rem;
+            }
+            .question-item .a {
+                font-size: 0.8rem;
+                margin-top: 4px;
+            }
+            .spoiler-btn {
+                font-size: 0.85rem;
+                padding: 8px 18px;
+            }
+            .spoiler-content {
+                padding: 14px 12px;
+                border-radius: 8px;
+            }
+            .spoiler-content h3 {
+                font-size: 1.1rem;
+            }
+            .spoiler-content .solution {
+                font-size: 0.85rem;
+                line-height: 1.6;
+            }
+            .back-btn {
+                font-size: 0.75rem;
+                padding: 4px 12px;
+                margin-bottom: 10px;
+            }
+            .footer {
+                font-size: 0.7rem;
+                padding: 12px 0 6px;
+                margin-top: 20px;
+            }
+            .cases-grid {
+                gap: 12px;
+            }
+            .grid-2 {
+                gap: 12px;
+            }
+            .divider {
+                margin: 14px 0;
+            }
+        }
+
+        /* ——— Для очень маленьких экранов (до 360px) ——— */
+        @media (max-width: 360px) {
+            .container {
+                padding: 4px 6px;
+            }
+            .sub-nav button {
+                font-size: 0.6rem;
+                padding: 3px 8px;
+            }
+            .card {
+                padding: 10px 8px;
+            }
+            .card-title {
+                font-size: 0.85rem;
+            }
+            .text-block {
+                font-size: 0.75rem;
+            }
+            .evidence-item .evid-title {
+                font-size: 0.75rem;
+            }
+            .evidence-item .evid-desc {
+                font-size: 0.7rem;
+            }
+            .person-card .name {
+                font-size: 0.8rem;
+            }
+            .person-card .avatar {
+                width: 48px;
+                height: 48px;
+                font-size: 1.2rem;
+            }
+        }
+
+        @media print {
+            .sub-nav,
+            .spoiler-btn,
+            .modal-overlay,
+            .back-btn,
+            .full-image-overlay {
+                display: none !important;
+            }
+            .page {
+                display: block !important;
+            }
+            .subpage {
+                display: block !important;
+            }
+            .spoiler-content {
+                display: block !important;
+                border: 1px solid #000;
+                background: #fff;
+                color: #000;
+            }
+            body {
+                background: #fff;
+                color: #000;
+            }
+            .card {
+                background: #f5f0eb;
+                border-color: #aaa;
+                box-shadow: none;
+            }
+            .header {
+                border-color: #aaa;
+            }
+            .person-card .avatar {
+                cursor: default;
+            }
+            .person-card .avatar:hover {
+                transform: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <span>🔍</span> Детективный архив
+            </div>
+            <div class="case-number">Дела № 214 & 317</div>
+        </header>
+
+        <!-- ============================================================ -->
+        <!-- ГЛАВНАЯ СТРАНИЦА (список дел) -->
+        <!-- ============================================================ -->
+        <div id="page-main" class="page active">
+            <div class="card">
+                <div class="card-title"><span class="emoji">📚</span> Архив дел</div>
+                <div class="text-block">
+                    <p>Выберите дело для расследования. Каждое содержит полный набор улик, показаний и вопросов.</p>
+                </div>
+            </div>
+
+            <div class="cases-grid">
+                <div class="case-card" data-case="case214">
+                    <div class="case-icon">📖</div>
+                    <div class="case-title">Дело № 214</div>
+                    <div class="case-sub">«Ядовитая книга»</div>
+                    <div class="case-badge">14 марта 2024</div>
+                </div>
+
+                <div class="case-card" data-case="case317">
+                    <div class="case-icon">🌿</div>
+                    <div class="case-title">Дело № 317</div>
+                    <div class="case-sub">«Смерть в стеклянной башне»</div>
+                    <div class="case-badge">22 апреля 2026</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ДЕЛО № 214 -->
+        <!-- ============================================================ -->
+        <div id="page-case214" class="page">
+            <button class="back-btn" data-back="main">← Вернуться к списку дел</button>
+
+            <div class="sub-nav" id="subNav214">
+                <button class="active" data-sub="overview214">📋 Обзор</button>
+                <button data-sub="suspects214">👥 Подозреваемые</button>
+                <button data-sub="evidence214">🔬 Улики</button>
+                <button data-sub="testimonies214">🗣️ Показания</button>
+                <button data-sub="questions214">❓ Вопросы</button>
+                <button data-sub="solution214">🔎 Разгадка</button>
+            </div>
+
+            <!-- Обзор 214 -->
+            <div id="overview214" class="subpage active">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">📁</span> Дело № 214 «Ядовитая книга»</div>
+                    <div class="text-block">
+                        <p><strong>Дата:</strong> 14 марта 2024 года.</p>
+                        <p><strong>Место:</strong> библиотека профессора Аркадия Северова.</p>
+                        <p><strong>Обстоятельства:</strong> профессор найден мёртвым в запертой изнутри библиотеке. Смерть от цианида.</p>
+                        <p><strong>Подозреваемые:</strong> жена Елена, коллега Виктор Громов, племянник Игорь, ассистентка Марта.</p>
+                        <hr class="divider" />
+                        <p><em>Изучите все улики и показания, чтобы найти убийцу. Разгадка — в последнем разделе.</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Подозреваемые 214 -->
+            <div id="suspects214" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">👥</span> Подозреваемые</div>
+                    <div class="grid-2" id="suspectsGrid214"></div>
+                </div>
+            </div>
+
+            <!-- Улики 214 -->
+            <div id="evidence214" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">🔬</span> Улики</div>
+                    <div id="evidenceList214"></div>
+                </div>
+            </div>
+
+            <!-- Показания 214 -->
+            <div id="testimonies214" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">🗣️</span> Показания</div>
+                    <div id="testimoniesList214"></div>
+                </div>
+            </div>
+
+            <!-- Вопросы 214 -->
+            <div id="questions214" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">❓</span> Вопросы по делу</div>
+                    <div id="questionsList214"></div>
+                </div>
+            </div>
+
+            <!-- Разгадка 214 -->
+            <div id="solution214" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">🔎</span> Разгадка</div>
+                    <div class="spoiler-container">
+                        <button class="spoiler-btn" data-target="spoiler214">📜 Показать разгадку</button>
+                    </div>
+                    <div class="spoiler-content" id="spoiler214">
+                        <h3>🔍 Разгадка дела № 214</h3>
+                        <div class="solution">
+                            <p><strong>Убийца – Виктор Громов.</strong></p>
+                            <p>Громов знал о привычке профессора облизывать палец при перелистывании страниц. Он пропитал страницы манускрипта цианидом, работая в перчатках. Профессор отравился, когда листал книгу. Дверь была заперта самим профессором.</p>
+                            <p><strong>Мотив:</strong> профессор собирался разоблачить Громова как автора поддельного манускрипта.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================ -->
+        <!-- ДЕЛО № 317 -->
+        <!-- ============================================================ -->
+        <div id="page-case317" class="page">
+            <button class="back-btn" data-back="main">← Вернуться к списку дел</button>
+
+            <div class="sub-nav" id="subNav317">
+                <button class="active" data-sub="overview317">📋 Обзор</button>
+                <button data-sub="suspects317">👥 Подозреваемые</button>
+                <button data-sub="evidence317">🔬 Улики</button>
+                <button data-sub="testimonies317">🗣️ Показания</button>
+                <button data-sub="questions317">❓ Вопросы</button>
+                <button data-sub="solution317">🔎 Разгадка</button>
+            </div>
+
+            <!-- Обзор 317 -->
+            <div id="overview317" class="subpage active">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">🌿</span> Дело № 317 «Смерть в стеклянной башне»</div>
+                    <div class="text-block">
+                        <p><strong>Дата:</strong> 22 апреля 2026 года.</p>
+                        <p><strong>Место:</strong> оранжерея-башня ботаника Леонида Вербова.</p>
+                        <p><strong>Обстоятельства:</strong> Вербов найден мёртвым в запертой изнутри оранжерее. Голова пробита горшком.</p>
+                        <p><strong>Подозреваемые:</strong> жена Мария, сын Тимур, управляющая Наталья, коллега Эдуард Кремер, ассистент Степан Литвак.</p>
+                        <hr class="divider" />
+                        <p><em>Изучите все улики и показания, чтобы найти убийцу. Разгадка — в последнем разделе.</em></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Подозреваемые 317 -->
+            <div id="suspects317" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">👥</span> Подозреваемые</div>
+                    <div class="grid-2" id="suspectsGrid317"></div>
+                </div>
+            </div>
+
+            <!-- Улики 317 -->
+            <div id="evidence317" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">🔬</span> Улики</div>
+                    <div id="evidenceList317"></div>
+                </div>
+            </div>
+
+            <!-- Показания 317 -->
+            <div id="testimonies317" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">🗣️</span> Показания</div>
+                    <div id="testimoniesList317"></div>
+                </div>
+            </div>
+
+            <!-- Вопросы 317 -->
+            <div id="questions317" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">❓</span> Вопросы по делу</div>
+                    <div id="questionsList317"></div>
+                </div>
+            </div>
+
+            <!-- Разгадка 317 -->
+            <div id="solution317" class="subpage">
+                <div class="card">
+                    <div class="card-title"><span class="emoji">🔎</span> Разгадка</div>
+                    <div class="spoiler-container">
+                        <button class="spoiler-btn" data-target="spoiler317">📜 Показать разгадку</button>
+                    </div>
+                    <div class="spoiler-content" id="spoiler317">
+                        <h3>🔍 Разгадка дела № 317</h3>
+                        <div class="solution">
+                            <p><strong>Убийца – Наталья Ильина, управляющая домом, при участии Степана Литвака.</strong></p>
+                            <p>Наталья проникла в башню через верхнюю створку с помощью альпинистской верёвки. Она ударила Вербова горшком, когда застала его у сейфа. Литвак помогал: заклеил камеру, запустил дымовую шашку в вентиляцию.</p>
+                            <p><strong>Мотив:</strong> Вербов узнал о краже семян № 7 и собирался вызвать полицию.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Детективный архив · Дела № 214 & 317 · 2024–2026</p>
+        </footer>
+    </div>
+
+    <!-- Modal для улик и показаний -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <button class="close-btn" id="modalCloseBtn">&times;</button>
+            <div id="modalImageContainer"></div>
+            <div class="modal-icon" id="modalIcon">📌</div>
+            <div class="modal-title" id="modalTitle">Заголовок</div>
+            <div class="modal-fulltext" id="modalFullText">Полный текст</div>
+        </div>
+    </div>
+
+    <!-- Full-image modal для фото подозреваемых -->
+    <div class="full-image-overlay" id="fullImageOverlay">
+        <button class="close-full" id="fullImageCloseBtn">&times;</button>
+        <img class="full-image-box" id="fullImageBox" src="" alt="Фото подозреваемого" />
+        <div class="full-image-name" id="fullImageName">Имя</div>
+    </div>
+
+    <script>
+        (function() {
+            // ================================================================
+            //  ПЕРЕМЕННЫЕ ДЛЯ ПУТЕЙ К ИЗОБРАЖЕНИЯМ
+            // ================================================================
+            const IMG = {
+                folder: 'img/',
+                suspects: {
+                    elena: 'elena.jpg',
+                    victor: 'victor.jpg',
+                    igor: 'igor.jpg',
+                    marta: 'marta.jpg',
+                    maria: 'maria.jpg',
+                    timur: 'timur.jpg',
+                    natalia: 'natalia.jpg',
+                    eduard: 'eduard.jpg',
+                    stepan: 'stepan.jpg'
+                },
+                evidence: {
+                    tea: 'tea.jpg',
+                    vial: 'vial.jpg',
+                    book: 'book.jpg',
+                    glasses: 'glasses.jpg',
+                    letter: 'letter.jpg',
+                    fire: 'fire.jpg',
+                    notebook: 'notebook.jpg',
+                    claw: 'claw.jpg',
+                    nails: 'nails.jpg',
+                    pot: 'pot.jpg',
+                    rope: 'rope.jpg',
+                    water: 'water.jpg',
+                    petals: 'petals.jpg',
+                    note: 'note.jpg',
+                    safe: 'safe.jpg',
+                    camera: 'camera.jpg',
+                    smoke: 'smoke.jpg',
+                    diary: 'diary.jpg'
+                },
+                testimony: {
+                    marta: 'testimony_marta.jpg',
+                    victor: 'testimony_victor.jpg',
+                    elena: 'testimony_elena.jpg',
+                    igor: 'testimony_igor.jpg',
+                    maria: 'testimony_maria.jpg',
+                    timur: 'testimony_timur.jpg',
+                    natalia: 'testimony_natalia.jpg',
+                    eduard: 'testimony_eduard.jpg',
+                    stepan: 'testimony_stepan.jpg'
+                }
+            };
+
+            function imgPath(filename) {
+                return filename ? IMG.folder + filename : null;
+            }
+
+            // ================================================================
+            //  ДАННЫЕ ДЛЯ ДЕЛА № 214
+            // ================================================================
+            const suspects214 = [{
+                id: 'elena',
+                name: 'Елена Северова',
+                age: '45 лет, жена',
+                motif: 'Мотив: муж недавно изменил завещание, лишив её наследства.',
+                alibi: 'Была в саду, утверждает, что в библиотеку не входила.',
+                img: IMG.suspects.elena
+            }, {
+                id: 'victor',
+                name: 'Виктор Громов',
+                age: '55 лет, коллега-историк, соперник',
+                motif: 'Мотив: профессор собирался разоблачить его как автора поддельного манускрипта.',
+                alibi: 'Приезжал в дом, но, по его словам, в библиотеку не входил.',
+                img: IMG.suspects.victor
+            }, {
+                id: 'igor',
+                name: 'Игорь Северов',
+                age: '28 лет, племянник',
+                motif: 'Мотив: получение наследства по новому завещанию.',
+                alibi: 'Был дома, слышал шаги, но не выходил из комнаты.',
+                img: IMG.suspects.igor
+            }, {
+                id: 'marta',
+                name: 'Марта Ковальски',
+                age: '30 лет, ассистентка',
+                motif: 'Мотив: профессор грозился уволить её.',
+                alibi: 'Приносила чай в 14:50, после чего ушла.',
+                img: IMG.suspects.marta
+            }];
+
+            const evidence214 = [{
+                id: 'ev1',
+                icon: '☕',
+                title: 'Чашка чая',
+                desc: 'На столе. Отпечатки профессора и Марты. На ободке — микрочастицы цианида.',
+                full: 'Чашка чая стояла на письменном столе. На ней обнаружены отпечатки пальцев профессора и Марты. Химический анализ показал, что в жидкости цианида нет, однако на внешнем ободке чашки найдены микрочастицы цианистого калия.',
+                img: IMG.evidence.tea
+            }, {
+                id: 'ev2',
+                icon: '🧪',
+                title: 'Пузырёк с цианидом',
+                desc: 'Пуст, лежит на каминной полке. Отпечатки только профессора.',
+                full: 'Пустой пузырёк с чёткой этикеткой «Цианистый калий» найден на каминной полке. На нём отпечатки только профессора. Пыль вокруг нарушена — пузырёк перемещали.',
+                img: IMG.evidence.vial
+            }, {
+                id: 'ev3',
+                icon: '📖',
+                title: 'Книга «Трактат о редких ядах»',
+                desc: 'На страницах — цианид и микрочастицы латекса (перчатки). Отпечатки только профессора.',
+                full: 'Книга открыта на столе. На страницах обнаружен цианид и микрочастицы латекса. Отпечатки пальцев на книге принадлежат только профессору.',
+                img: IMG.evidence.book
+            }, {
+                id: 'ev4',
+                icon: '👓',
+                title: 'Разбитые очки',
+                desc: 'Лежат у двери. Одно стекло разбито, дужка погнута.',
+                full: 'Очки лежали у самой двери. Профессор уронил их, когда пытался встать и дойти до двери в агонии.',
+                img: IMG.evidence.glasses
+            }, {
+                id: 'ev5',
+                icon: '✉️',
+                title: 'Письмо с угрозами',
+                desc: 'Водяной знак совпадает с бумагой Громова. Лингвистика указывает на него.',
+                full: 'Анонимное письмо с угрозами. Бумага имеет редкий водяной знак, идентичный тому, что найден у Громова.',
+                img: IMG.evidence.letter
+            }, {
+                id: 'ev6',
+                icon: '📓',
+                title: 'Записная книжка',
+                desc: 'Запись: «15:00 – встреча с В.Г. Подготовить обвинение».',
+                full: 'В записной книжке: «Обнаружил анахронизмы в манускрипте Громова. Похоже на подделку».',
+                img: IMG.evidence.notebook
+            }, {
+                id: 'ev7',
+                icon: '🔬',
+                title: 'Под ногтями профессора',
+                desc: 'Цианид и микрочастицы бумаги со страниц книги.',
+                full: 'Под ногтями найдены цианид и частицы бумаги, идентичной страницам книги. Яд попал через пальцы.',
+                img: IMG.evidence.nails
+            }];
+
+            const testimonies214 = [{
+                id: 't1',
+                speaker: 'Марта Ковальски (ассистентка)',
+                text: '«Я принесла чай в 14:50. Профессор был один, листал книгу. Я вышла, дверь не запирала. Позже слышала, как приходил Громов.»',
+                icon: '👩‍💼',
+                img: IMG.testimony.marta
+            }, {
+                id: 't2',
+                speaker: 'Виктор Громов (коллега)',
+                text: '«Пришёл в 15:00, постучал. Никто не открыл. Я слышал шум, но подумал, что профессор занят. Подождал и ушёл.»',
+                icon: '👨‍🏫',
+                img: IMG.testimony.victor
+            }, {
+                id: 't3',
+                speaker: 'Елена Северова (жена)',
+                text: '«Я была в саду. В 15:30 поднялась, постучала – тишина. Позвала Игоря, вызвали полицию.»',
+                icon: '👩',
+                img: IMG.testimony.elena
+            }, {
+                id: 't4',
+                speaker: 'Игорь Северов (племянник)',
+                text: '«Я был в своей комнате. Помогал взламывать дверь. Профессор лежал на полу, уже мёртвый.»',
+                icon: '🧑',
+                img: IMG.testimony.igor
+            }];
+
+            const questions214 = [{
+                q: 'Кто убийца и как он совершил убийство в запертой комнате?',
+                a: '...'
+            }, {
+                q: 'Какую роль сыграла чашка чая в расследовании?',
+                a: '...'
+            }, {
+                q: 'Какая улика напрямую указывает на Громова?',
+                a: '...'
+            }];
+
+            // ================================================================
+            //  ДАННЫЕ ДЛЯ ДЕЛА № 317
+            // ================================================================
+            const suspects317 = [{
+                id: 'maria',
+                name: 'Мария Вербова',
+                age: '40 лет, вдова, вторая жена',
+                motif: 'Мотив: Вербов недавно заявил, что оставит всё имущество научному фонду.',
+                alibi: 'В момент убийства была в доме, готовила ужин.',
+                img: IMG.suspects.maria
+            }, {
+                id: 'timur',
+                name: 'Тимур Вербов',
+                age: '35 лет, сын от первого брака',
+                motif: 'Мотив: отец отстранил его от управления фирмой из-за долгов.',
+                alibi: 'Уехал за час до смерти, есть чек из кафе.',
+                img: IMG.suspects.timur
+            }, {
+                id: 'natalia',
+                name: 'Наталья Ильина',
+                age: '45 лет, управляющая домом',
+                motif: 'Мотив: Вербов грозил уволить её за кражу редких семян.',
+                alibi: 'Нашла тело, утверждает, что не входила в башню.',
+                img: IMG.suspects.natalia
+            }, {
+                id: 'eduard',
+                name: 'Эдуард Кремер',
+                age: '60 лет, коллега-ботаник',
+                motif: 'Мотив: многолетний спор о первенстве открытия нового вида орхидеи.',
+                alibi: 'Ждал Вербова на ужин, стучал в дверь башни.',
+                img: IMG.suspects.eduard
+            }, {
+                id: 'stepan',
+                name: 'Степан Литвак',
+                age: '30 лет, ассистент Вербова',
+                motif: 'Мотив: Вербов украл идею его диссертации.',
+                alibi: 'Работал в подвальной лаборатории.',
+                img: IMG.suspects.stepan
+            }];
+
+            const evidence317 = [{
+                id: 'ev317_1',
+                icon: '🪴',
+                title: 'Керамический горшок (орудие)',
+                desc: 'Разбит. На осколках — отпечатки тканевых перчаток.',
+                full: 'Керамический горшок с орхидеей разбит. На осколках отпечатки перчаток с грубой текстурой. Под ногтями Вербова — частицы почвы, но нет следов борьбы.',
+                img: IMG.evidence.pot
+            }, {
+                id: 'ev317_2',
+                icon: '🧗',
+                title: 'Волокна на стекле (3-й уровень)',
+                desc: 'Зелёный нейлон, похожий на альпинистскую верёвку.',
+                full: 'На стекле снаружи у верха найдены микроскопические волокна зелёного нейлона. На балке под куполом — стёртая краска и микрочастицы того же нейлона.',
+                img: IMG.evidence.rope
+            }, {
+                id: 'ev317_3',
+                icon: '💧',
+                title: 'Лужа воды под створкой',
+                desc: 'Дистиллированная вода с удобрением для орхидей.',
+                full: 'Вода не дождевая, а дистиллированная. В ней растворены следы удобрения для орхидей, которое использовал только Литвак.',
+                img: IMG.evidence.water
+            }, {
+                id: 'ev317_4',
+                icon: '🌺',
+                title: 'Лепестки рододендрона',
+                desc: 'Ядовитое растение из дендрария Кремера.',
+                full: 'Лепестки Rhododendron tomentosum. Внутри — пыльца и почва из дендрария Эдуарда Кремера.',
+                img: IMG.evidence.petals
+            }, {
+                id: 'ev317_5',
+                icon: '📝',
+                title: 'Записка в кармане халата',
+                desc: '«...проверь семена в сейфе: № 7».',
+                full: 'Клочок бумаги с текстом карандашом. На обороте — рисунок шестиугольника. Бумага со следами клейкой ленты.',
+                img: IMG.evidence.note
+            }, {
+                id: 'ev317_6',
+                icon: '🔐',
+                title: 'Сейф в оранжерее',
+                desc: 'Вскрыт кодом. Пробирка № 7 отсутствует.',
+                full: 'Сейф вскрыт без взлома. Внутри пустые пробирки № 1–6, пробирки № 7 нет. На дверце — след нитриловой перчатки с пыльцой рододендрона.',
+                img: IMG.evidence.safe
+            }, {
+                id: 'ev317_7',
+                icon: '📹',
+                title: 'Видеокамера над входом',
+                desc: 'Объектив заклеен изолентой. На изоленте — отпечаток мизинца Литвака.',
+                full: 'Камера заклеена чёрной изолентой. На изоленте отпечаток мизинца левой руки, совпадающий с отпечатком на стакане Литвака.',
+                img: IMG.evidence.camera
+            }, {
+                id: 'ev317_8',
+                icon: '💨',
+                title: 'Запах дыма и пепел',
+                desc: 'В вентиляции — пепел и следы магния. Дымовая шашка.',
+                full: 'В вентиляции найден пепел и обрывок фольги со следами порошка магния. На третьем уровне — ожоги от пиротехники.',
+                img: IMG.evidence.smoke
+            }, {
+                id: 'ev317_9',
+                icon: '📓',
+                title: 'Дневник Вербова',
+                desc: 'Последняя запись: «Семена № 7 — моя страховка».',
+                full: 'Последняя запись: «Э.К. снова угрожал. Он готов пойти на всё. Но я знаю его тайну. Семена № 7 — моя страховка».',
+                img: IMG.evidence.diary
+            }];
+
+            const testimonies317 = [{
+                id: 't317_1',
+                speaker: 'Мария Вербова (жена)',
+                text: '«Я готовила ужин, слышала хлопок двери около 19:00. Муж шёл в башню. Через десять минут услышала крик.»',
+                icon: '👩',
+                img: IMG.testimony.maria
+            }, {
+                id: 't317_2',
+                speaker: 'Тимур Вербов (сын)',
+                text: '«Я уехал в 18:30. Отец вышел во двор, помахал рукой. Я слышал, как скрипнула дверь башни, хотя ветра не было.»',
+                icon: '🧑',
+                img: IMG.testimony.timur
+            }, {
+                id: 't317_3',
+                speaker: 'Наталья Ильина (управляющая)',
+                text: '«Я видела, как около 19:10 к башне подошёл Кремер, но не вошёл. Через двадцать минут я нашла тело. Из башни пахло дымом.»',
+                icon: '👩‍💼',
+                img: IMG.testimony.natalia
+            }, {
+                id: 't317_4',
+                speaker: 'Эдуард Кремер (коллега)',
+                text: '«Я пришёл на ужин, постучал в башню, ответа не было. Я подождал и вернулся в дом. Запах дыма? Не помню.»',
+                icon: '👨‍🏫',
+                img: IMG.testimony.eduard
+            }, {
+                id: 't317_5',
+                speaker: 'Степан Литвак (ассистент)',
+                text: '«Я работал в подвале, варил раствор. Поднялся около 19:45. В башню я не ходил. Сейф я не открывал.»',
+                icon: '🧪',
+                img: IMG.testimony.stepan
+            }];
+
+            const questions317 = [{
+                q: 'Кто и как проник в запертую башню?',
+                a: '...'
+            }, {
+                q: 'Какую роль сыграли семена № 7?',
+                a: '...'
+            }, {
+                q: 'Кто заклеил камеру и зачем?',
+                a: '...'
+            }, {
+                q: 'Почему лепестки рододендрона были подброшены к телу?',
+                a: '...'
+            }];
+
+            // ================================================================
+            //  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+            // ================================================================
+            function renderSuspects(containerId, data) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                data.forEach(s => {
+                    const card = document.createElement('div');
+                    card.className = 'person-card';
+                    const imgSrc = imgPath(s.img);
+                    const avatarContent = imgSrc ?
+                        `<img src="${imgSrc}" alt="${s.name}" onerror="this.style.display='none';this.parentElement.textContent='${s.id.charAt(0).toUpperCase()}';">` :
+                        `${s.id.charAt(0).toUpperCase()}`;
+                    card.innerHTML = `
+                        <div class="avatar" data-fullimg="${imgSrc || ''}" data-name="${s.name}">
+                            ${avatarContent}
+                            <span class="zoom-hint">🔍</span>
+                        </div>
+                        <div class="name">${s.name}</div>
+                        <div class="detail">${s.age}</div>
+                        <div class="motif"><strong>${s.motif}</strong></div>
+                        <div class="detail" style="margin-top:8px;">${s.alibi}</div>
+                    `;
+                    container.appendChild(card);
+                });
+
+                container.querySelectorAll('.avatar').forEach(avatar => {
+                    avatar.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const imgSrc = this.dataset.fullimg;
+                        const name = this.dataset.name;
+                        if (imgSrc) {
+                            openFullImage(imgSrc, name);
+                        }
+                    });
+                });
+            }
+
+            function renderEvidence(containerId, data) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'evidence-item';
+                    div.dataset.icon = item.icon;
+                    div.dataset.title = item.title;
+                    div.dataset.full = item.full;
+                    div.dataset.img = imgPath(item.img) || '';
+                    div.innerHTML = `
+                        <div class="evid-icon">${item.icon}</div>
+                        <div class="evid-content">
+                            <div class="evid-title">${item.title}</div>
+                            <div class="evid-desc">${item.desc}</div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            function renderTestimonies(containerId, data) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'testimony';
+                    div.dataset.icon = item.icon;
+                    div.dataset.speaker = item.speaker;
+                    div.dataset.full = item.text;
+                    div.dataset.img = imgPath(item.img) || '';
+                    div.innerHTML = `
+                        <div class="testimony-icon">${item.icon}</div>
+                        <div class="testimony-content">
+                            <span class="speaker">${item.speaker}</span>
+                            <div class="testimony-text">${item.text}</div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            function renderQuestions(containerId, data) {
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'question-item';
+                    div.innerHTML = `
+                        <div class="q">${item.q}</div>
+                        <div class="a">${item.a}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            // ================================================================
+            //  FULL-IMAGE MODAL
+            // ================================================================
+            const fullImageOverlay = document.getElementById('fullImageOverlay');
+            const fullImageBox = document.getElementById('fullImageBox');
+            const fullImageName = document.getElementById('fullImageName');
+            const fullImageCloseBtn = document.getElementById('fullImageCloseBtn');
+
+            function openFullImage(src, name) {
+                fullImageBox.src = src;
+                fullImageName.textContent = name || 'Подозреваемый';
+                fullImageOverlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeFullImage() {
+                fullImageOverlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            fullImageCloseBtn.addEventListener('click', closeFullImage);
+            fullImageOverlay.addEventListener('click', function(e) {
+                if (e.target === fullImageOverlay) closeFullImage();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeFullImage();
+            });
+
+            // ================================================================
+            //  МОДАЛЬНОЕ ОКНО ДЛЯ УЛИК И ПОКАЗАНИЙ
+            // ================================================================
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalCloseBtn = document.getElementById('modalCloseBtn');
+            const modalImageContainer = document.getElementById('modalImageContainer');
+            const modalIcon = document.getElementById('modalIcon');
+            const modalTitle = document.getElementById('modalTitle');
+            const modalFullText = document.getElementById('modalFullText');
+
+            function openModal(icon, title, fullText, imgSrc) {
+                modalIcon.textContent = icon;
+                modalTitle.textContent = title;
+                modalFullText.innerHTML = fullText.replace(/\n/g, '<br />');
+
+                modalImageContainer.innerHTML = '';
+                if (imgSrc) {
+                    const img = document.createElement('img');
+                    img.className = 'modal-image';
+                    img.src = imgSrc;
+                    img.alt = title;
+                    img.onerror = function() { this.style.display = 'none'; };
+                    modalImageContainer.appendChild(img);
+                }
+
+                modalOverlay.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeModal() {
+                modalOverlay.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            modalCloseBtn.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', function(e) {
+                if (e.target === modalOverlay) closeModal();
+            });
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') closeModal();
+            });
+
+            // Клики по уликам и показаниям
+            document.addEventListener('click', function(e) {
+                const el = e.target.closest('.evidence-item');
+                if (el) {
+                    openModal(el.dataset.icon, el.dataset.title, el.dataset.full, el.dataset.img);
+                    return;
+                }
+                const testimony = e.target.closest('.testimony');
+                if (testimony) {
+                    const full = `<p><strong>${testimony.dataset.speaker}</strong></p><p>${testimony.dataset.full}</p>`;
+                    openModal(testimony.dataset.icon, 'Показание свидетеля', full, testimony.dataset.img);
+                }
+            });
+
+            // ================================================================
+            //  РЕНДЕРИНГ ВСЕХ ДЕЛ
+            // ================================================================
+            renderSuspects('suspectsGrid214', suspects214);
+            renderEvidence('evidenceList214', evidence214);
+            renderTestimonies('testimoniesList214', testimonies214);
+            renderQuestions('questionsList214', questions214);
+
+            renderSuspects('suspectsGrid317', suspects317);
+            renderEvidence('evidenceList317', evidence317);
+            renderTestimonies('testimoniesList317', testimonies317);
+            renderQuestions('questionsList317', questions317);
+
+            // ================================================================
+            //  НАВИГАЦИЯ: ГЛАВНАЯ → ДЕЛО
+            // ================================================================
+            const mainPage = document.getElementById('page-main');
+            const casePages = {
+                case214: document.getElementById('page-case214'),
+                case317: document.getElementById('page-case317')
+            };
+
+            document.querySelectorAll('.case-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    const caseId = this.dataset.case;
+                    showCase(caseId);
+                });
+            });
+
+            function showCase(caseId) {
+                mainPage.classList.remove('active');
+                Object.values(casePages).forEach(p => p.classList.remove('active'));
+
+                if (caseId === 'main') {
+                    mainPage.classList.add('active');
+                    history.pushState(null, '', '#');
+                    return;
+                }
+                if (casePages[caseId]) {
+                    casePages[caseId].classList.add('active');
+                    history.pushState(null, '', '#' + caseId);
+                    const subNav = casePages[caseId].querySelector('.sub-nav');
+                    if (subNav) {
+                        const firstBtn = subNav.querySelector('button');
+                        if (firstBtn) showSubpage(caseId, firstBtn.dataset.sub);
+                    }
+                }
+            }
+
+            document.querySelectorAll('.back-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    showCase('main');
+                });
+            });
+
+            // ================================================================
+            //  НАВИГАЦИЯ: ПОДРАЗДЕЛЫ ВНУТРИ ДЕЛА
+            // ================================================================
+            function showSubpage(caseId, subId) {
+                const casePage = casePages[caseId];
+                if (!casePage) return;
+
+                casePage.querySelectorAll('.subpage').forEach(p => p.classList.remove('active'));
+
+                const target = document.getElementById(subId);
+                if (target) target.classList.add('active');
+
+                casePage.querySelectorAll('.sub-nav button').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.sub === subId) btn.classList.add('active');
+                });
+            }
+
+            document.querySelectorAll('.sub-nav').forEach(nav => {
+                const caseId = nav.id.replace('subNav', 'case');
+                nav.querySelectorAll('button').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        showSubpage(caseId, this.dataset.sub);
+                    });
+                });
+            });
+
+            // ================================================================
+            //  СПОЙЛЕРЫ
+            // ================================================================
+            document.querySelectorAll('.spoiler-btn').forEach(btn => {
+                const targetId = btn.dataset.target;
+                const content = document.getElementById(targetId);
+                let revealed = false;
+
+                btn.addEventListener('click', function() {
+                    if (!revealed) {
+                        content.classList.add('show');
+                        this.textContent = '🔒 Скрыть разгадку';
+                        revealed = true;
+                    } else {
+                        content.classList.remove('show');
+                        this.textContent = '📜 Показать разгадку';
+                        revealed = false;
+                    }
+                });
+            });
+
+            // ================================================================
+            //  ВОССТАНОВЛЕНИЕ СОСТОЯНИЯ ПО URL
+            // ================================================================
+            const hash = window.location.hash.substring(1);
+            if (hash && casePages[hash]) {
+                showCase(hash);
+            } else {
+                mainPage.classList.add('active');
+            }
+
+            window.addEventListener('hashchange', function() {
+                const h = window.location.hash.substring(1);
+                if (h && casePages[h]) {
+                    showCase(h);
+                } else {
+                    showCase('main');
+                }
+            });
+
+        })();
+    </script>
+
+</body>
+</html>
